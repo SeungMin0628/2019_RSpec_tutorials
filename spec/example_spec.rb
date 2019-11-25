@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 # describe {}: テストのグループ。大分類。describeの内容をdescribeで分けることもできる。
+# context {}: describeと同じ役割。条件を分ける際に主に利用する
 # it {}: example 単位でテストをまとめる。 小分類。このブロックで含まっている`expect`が全てパスすると、このテストは成功。
 # テストの不合格の報告はit単位で行われる
 
