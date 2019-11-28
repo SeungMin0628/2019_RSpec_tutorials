@@ -7,21 +7,41 @@ require 'spec_helper'
 # subject { ... } : テスト対象のオブジェクトが1つに決まっている場合に利用。expect(...)を1つの文章にまとめ、DRYなコードを書くのができる
 #     = subjectで定義したコードは、`is_expected`メソッドで呼び出すことができる
 #     = it '...' do ... end のブロックを it { is_expected.to ... } で省略するのができる
+# テストコードの共有
+#     = shared_examples
+#     = it_behaves_like : 
 
 RSpec.describe User do
   describe '#greet' do
-    let(:user) { User.new(params) }
-    let(:params) { { name: 'やまだ', age: age } }
+    let(:user) { User.new(name: 'やまだ', age: age) }
     subject { user.greet } 
 
-    context '12歳以下の場合' do
-      let(:age) { 12 }
+    shared_examples '子供の挨拶' do
       it { is_expected.to eq 'ぼくはやまだだよ。' } 
+    end
+
+    shared_examples '大人の挨拶' do
+      it { is_expected.to eq '僕はやまだです。' } 
+    end
+
+    context '0歳の場合' do
+      let(:age) { 0 }
+      it_behaves_like '子供の挨拶'
+    end
+
+    context '12歳の場合' do
+      let(:age) { 12 }
+      it_behaves_like '子供の挨拶'
     end
 
     context '13歳以上の場合' do
       let(:age) { 13 }
-      it { is_expected.to eq '僕はやまだです。' } 
+      it_behaves_like '大人の挨拶'
+    end
+
+    context '100歳の場合' do
+      let(:age) { 100 }
+      it_behaves_like '大人の挨拶'
     end
   end
 end
