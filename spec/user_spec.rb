@@ -8,12 +8,34 @@ require 'spec_helper'
 #     = subjectで定義したコードは、`is_expected`メソッドで呼び出すことができる
 #     = it '...' do ... end のブロックを it { is_expected.to ... } で省略するのができる
 # テストコードの共有
-#     = shared_examples
-#     = it_behaves_like : 
+#     = shared_examples : 共有しようとするコードを定義する
+#     = it_behaves_like : テストの結果として期待する振る舞いを読み取る
+# contextの共有
+#     = shared_context : 共有しようとするcontextを定義する
+#     = include_context : 定義したshared_contextを利用する
+# booleanの検証で書き換える
+#     = expect(...).to eq true => expect(...).to be_truthy
+#     = expect(...).to eq false => expect(...).to be_falsy
 
 RSpec.describe User do
+  let(:user) { User.new(name: 'やまだ', age: age) }
+  shared_context '0歳の場合' do
+    let(:age) { 0 }
+  end
+
+  shared_context '12歳の場合' do
+    let(:age) { 12 }
+  end
+
+  shared_context '13歳の場合' do
+    let(:age) { 13 }
+  end
+
+  shared_context '100歳の場合' do
+    let(:age) { 100 }
+  end
+
   describe '#greet' do
-    let(:user) { User.new(name: 'やまだ', age: age) }
     subject { user.greet } 
 
     shared_examples '子供の挨拶' do
@@ -25,23 +47,47 @@ RSpec.describe User do
     end
 
     context '0歳の場合' do
-      let(:age) { 0 }
+      include_context '0歳の場合'
       it_behaves_like '子供の挨拶'
     end
 
     context '12歳の場合' do
-      let(:age) { 12 }
+      include_context '12歳の場合'
       it_behaves_like '子供の挨拶'
     end
 
     context '13歳以上の場合' do
-      let(:age) { 13 }
+      include_context '13歳の場合'
       it_behaves_like '大人の挨拶'
     end
 
     context '100歳の場合' do
-      let(:age) { 100 }
+      include_context '100歳の場合'
       it_behaves_like '大人の挨拶'
+    end
+  end
+
+  describe "#child?" do
+    subject { user.child? } 
+
+    context "0歳の場合" do
+      include_context '0歳の場合'
+      it { is_expected.to be_truthy } 
+    end
+
+    context "12歳の場合" do
+      include_context '12歳の場合'
+      it { is_expected.to be_truthy } 
+    end
+
+    context "13歳の場合" do
+      include_context '13歳の場合'
+      it { is_expected.to be_falsy } 
+    end
+
+    context "100歳の場合" do
+      include_context '100歳の場合'
+      it { is_expected.to be_falsy } 
     end
   end
 end
